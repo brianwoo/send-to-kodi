@@ -12,7 +12,7 @@ Options:
   -l PORT                Local port number used for file sharing (default 8080)
   -r HOST:PORT           Kodi remote address
   -u USERNAME:PASSWORD   Kodi login credentials
-  -s HLS (m3u8)          Use Kodi's HLS playback
+  -s                     Use Kodi's HLS (m3u8) playback
   -y                     Use Kodi's youtube addon instead of youtube-dl
 
 Environment variables:
