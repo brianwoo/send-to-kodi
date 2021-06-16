@@ -12,6 +12,7 @@ Options:
   -l PORT                Local port number used for file sharing (default 8080)
   -r HOST:PORT           Kodi remote address
   -u USERNAME:PASSWORD   Kodi login credentials
+  -s HLS (m3u8)          Use Kodi's HLS playback
   -y                     Use Kodi's youtube addon instead of youtube-dl
 
 Environment variables:
@@ -126,6 +127,7 @@ cleanup()
 
 GUI=1
 DOWNLOAD_DIR=~
+KODI_HLS=0
 KODI_YOUTUBE=0
 SHARE_PORT=8080
 
@@ -136,6 +138,7 @@ while [[ $* ]]; do
         -l) SHARE_PORT="$2";     shift ;;
         -r) REMOTE="$2";         shift ;;
         -u) LOGIN="$2";          shift ;;
+        -s) KODI_HLS=1;                ;;
         -y) KODI_YOUTUBE=1;            ;;
         -*) error "Unknown flag: $1"   ;;
          *) INPUT="$1"; GUI=0          ;;
@@ -166,6 +169,10 @@ elif [[ $INPUT =~ \.(mp4|mkv|mov|avi|flv|wmv|asf|mp3|flac|mka|m4a|aac|ogg|pls|jp
 elif ((KODI_YOUTUBE)) && [[ $INPUT =~ ^https?://(www\.)?youtu(\.be/|be\.com/watch\?v=) ]]; then
     id="$(sed -E 's%.*(youtu\.be/|[&?]v=)([a-zA-Z0-9_-]+).*%\2%' <<< "$INPUT")"
     url="plugin://plugin.video.youtube/?action=play_video&videoid=$id"
+
+# Direct HLS
+elif [[ -n "$KODI_HLS" ]]; then
+    url="$INPUT"
 
 # youtube-dl
 else
@@ -217,6 +224,7 @@ else
             
         # Download with youtube-dl
         elif [[ -z $url ]] || question "Download for better quality?"; then
+            echo "download_and_serve"
             download_and_serve "$INPUT"
             url="http://$HOSTNAME:$SHARE_PORT/media"
         fi
